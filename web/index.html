@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#FFF7F1">
+<meta name="description" content="合成猫 · 休闲离线合成小游戏的网页试玩版，玩法与 iOS 原生版一致">
+<title>合成猫 · 在线试玩</title>
+<style>
+  :root {
+    --bg-top: #FFF7F1;
+    --bg-bottom: #FFE6EF;
+    --ink: #3B2B22;
+    --ink-soft: #8A7A70;
+    --card: rgba(255, 255, 255, 0.92);
+    --pink: #E4758C;
+    --line: rgba(59, 43, 34, 0.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-top: #1C1A20;
+      --bg-bottom: #2A2430;
+      --ink: #F3ECE6;
+      --ink-soft: #A99E96;
+      --card: rgba(44, 40, 48, 0.92);
+      --line: rgba(255, 255, 255, 0.14);
+    }
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    color: var(--ink);
+    background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    background-attachment: fixed;
+    overscroll-behavior: none;
+  }
+  body {
+    display: flex; flex-direction: column; align-items: center;
+    padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+    gap: 10px;
+  }
+  header {
+    width: 100%; max-width: 420px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .score-block { display: flex; flex-direction: column; min-width: 92px; }
+  .score-label { font-size: 11px; color: var(--ink-soft); letter-spacing: 0.5px; }
+  .score-value { font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .best-value { font-size: 11px; color: var(--ink-soft); }
+  .next-block {
+    margin-left: auto; display: flex; align-items: center; gap: 8px;
+    padding: 6px 10px; background: var(--card); border-radius: 14px; border: 1px solid var(--line);
+  }
+  #nextCanvas { width: 44px; height: 44px; display: block; }
+  .next-text { display: flex; flex-direction: column; }
+  .next-label { font-size: 11px; color: var(--ink-soft); }
+  .next-name { font-size: 14px; font-weight: 500; }
+  .tools { display: flex; gap: 2px; }
+  button.icon {
+    width: 44px; height: 44px; border: none; background: transparent;
+    font-size: 15px; color: var(--ink); border-radius: 12px; cursor: pointer;
+  }
+  button.icon:active { background: rgba(0,0,0,0.06); }
+  .stage {
+    position: relative; width: 100%; max-width: 420px;
+    background: var(--card); border-radius: 24px; border: 1px solid var(--line);
+    overflow: hidden; touch-action: none;
+  }
+  canvas#game { display: block; width: 100%; height: auto; }
+  footer {
+    width: 100%; max-width: 420px; text-align: center;
+    font-size: 12px; color: var(--ink-soft); line-height: 1.6;
+  }
+  .overlay {
+    position: absolute; inset: 0; display: none;
+    align-items: center; justify-content: center;
+    background: rgba(0, 0, 0, 0.32); backdrop-filter: blur(2px);
+  }
+  .overlay.show { display: flex; }
+  .panel {
+    background: var(--card); border-radius: 20px; padding: 20px; margin: 20px;
+    text-align: center; min-width: 240px; border: 1px solid var(--line);
+  }
+  .panel h2 { margin: 0 0 6px; font-size: 18px; font-weight: 600; }
+  .final-score { font-size: 44px; font-weight: 600; font-variant-numeric: tabular-nums; margin: 4px 0; }
+  .panel p { margin: 4px 0; font-size: 13px; color: var(--ink-soft); }
+  .new-best { color: var(--pink); font-weight: 500; }
+  .actions { display: flex; gap: 10px; justify-content: center; margin-top: 14px; }
+  .btn {
+    min-height: 44px; padding: 0 18px; border-radius: 12px; border: 1px solid var(--line);
+    background: transparent; color: var(--ink); font-size: 15px; font-weight: 500; cursor: pointer;
+  }
+  .btn.primary { background: var(--pink); color: #fff; border-color: transparent; }
+  .links { font-size: 12px; margin-top: 8px; }
+  .links a { color: var(--pink); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="score-block">
+    <span class="score-label">得分</span>
+    <span class="score-value" id="score">0</span>
+    <span class="best-value">最高 <span id="best">0</span></span>
+  </div>
+  <div class="next-block">
+    <canvas id="nextCanvas" width="132" height="132" aria-label="下一只猫"></canvas>
+    <div class="next-text">
+      <span class="next-label">下一只</span>
+      <span class="next-name" id="nextName">奶猫崽</span>
+    </div>
+  </div>
+  <div class="tools">
+    <button class="icon" id="btnSound" title="音效开关" aria-label="音效开关">♪</button>
+    <button class="icon" id="btnRestart" title="重新开始" aria-label="重新开始">↺</button>
+  </div>
+</header>
+
+<div class="stage">
+  <canvas id="game" aria-label="合成猫游戏区，拖动选择位置，松手放下猫咪"></canvas>
+  <div class="overlay" id="overlay">
+    <div class="panel">
+      <h2>游戏结束</h2>
+      <div class="final-score" id="finalScore">0</div>
+      <p id="topCat">最大猫咪：奶猫崽</p>
+      <p id="newBest" class="new-best" style="display:none">新纪录！</p>
+      <div class="actions">
+        <button class="btn primary" id="btnAgain">再来一局</button>
+        <button class="btn" id="btnClose">看看棋盘</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  拖动瞄准 · 松手放下 · 两只相同的猫会合成更大的猫<br>
+  网页试玩版，玩法与 iOS 原生版一致 · 完全离线 · 成绩保存在本机浏览器
+</footer>
+
+<script src="game.js"></script>
+</body>
+</html>

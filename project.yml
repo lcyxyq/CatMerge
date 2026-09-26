@@ -1,0 +1,35 @@
+name: CatMerge
+
+options:
+  bundleIdPrefix: com.lcyxyq
+  deploymentTarget:
+    iOS: "17.0"
+  groupOrdering:
+    - order: [App, Game, Data, UI, Resources]
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    CLANG_ENABLE_MODULES: YES
+    ENABLE_STRICT_OBJC_MSGSEND: YES
+
+targets:
+  CatMerge:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources
+      - path: Resources/PrivacyInfo.xcprivacy
+    settings:
+      base:
+        PRODUCT_NAME: CatMerge
+        PRODUCT_BUNDLE_IDENTIFIER: com.lcyxyq.CatMerge
+        TARGETED_DEVICE_FAMILY: "1,2"
+        INFOPLIST_FILE: Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        CODE_SIGN_STYLE: Automatic
+        SWIFT_EMIT_LOC_STRINGS: YES
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks"
+    info:
+      path: Info.plist
