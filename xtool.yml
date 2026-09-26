@@ -1,0 +1,11 @@
+# xtool 打包描述（schema v1）
+# 字段来源：xtool Sources/PackLib/PackSchema.swift
+#   version / orgID / bundleID / product / infoPath / entitlementsPath
+#   / iconPath / resources / extensions / skipLSP
+version: 1
+bundleID: com.lcyxyq.CatMerge
+product: CatMerge
+# 复用仓库根的 Info.plist（已写死 Bundle ID 与可执行名，不做变量替换）
+infoPath: Info.plist
+resources:
+  - Resources/PrivacyInfo.xcprivacy

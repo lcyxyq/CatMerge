@@ -6,12 +6,15 @@
 	<string>合成猫</string>
 	<key>CFBundleName</key>
 	<string>CatMerge</string>
+	<!-- 写死实际值而非 $(...) 变量：xtool 不做 Info.plist 变量替换，
+	     否则 Bundle ID 会变成字面量 "$(PRODUCT_BUNDLE_IDENTIFIER)" 导致签名失败。
+	     这两个值对 Xcode 链路同样适用（与 project.yml 中的设置一致）。 -->
 	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<string>com.lcyxyq.CatMerge</string>
 	<key>CFBundleExecutable</key>
-	<string>$(EXECUTABLE_NAME)</string>
+	<string>CatMerge</string>
 	<key>CFBundlePackageType</key>
-	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>

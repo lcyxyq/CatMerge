@@ -228,3 +228,68 @@ iOS 的安装受签名限制，这里说清楚可行路径：
 - 本工程代码：**MIT**（见 `LICENSE`）。
 - 玩法参考来源：`Asterless/MGPIC2025`（Apache-2.0）与 `LordSpecial/suika-game`（Unlicense）。
 - 所有猫脸图形与音效均为本工程程序化生成，不含任何上游素材。
+
+---
+
+## 十四、xtool：在没有 Mac 的机器上构建并部署到真机
+
+[xtool](https://github.com/xtool-org/xtool) 是跨平台的 Xcode 替代品，能用 SwiftPM 把 iOS App
+构建、签名并安装到真实设备上，支持 Linux、macOS 与 **Windows（经由 WSL2）**。
+
+仓库已内置所需配置：`Package.swift`（SwiftPM 描述）与 `xtool.yml`（打包描述，schema v1）。
+
+### 前置条件
+
+| 项 | 要求 |
+| --- | --- |
+| 系统 | Windows 10/11 + **WSL2**（Ubuntu 22.04 / 24.04）或 Linux |
+| Swift | 6.3 工具链（Linux 版） |
+| 设备通信 | `usbmuxd`、`libimobiledevice-utils`；Windows 端用 `usbipd` 做 USB 穿透 |
+| Xcode.xip | 从 Apple 开发者下载页手动下载，供 xtool 生成名为 `darwin` 的 Swift SDK |
+| Apple ID | 免费账号可用（密码模式，走私有 API）；付费账号可用 App Store Connect API Key |
+| 磁盘 | Xcode.xip 约 10GB+，解压后约 60GB |
+
+### 一键安装依赖
+
+```bash
+git clone https://github.com/lcyxyq/CatMerge.git
+cd CatMerge
+bash scripts/setup-xtool-wsl.sh
+```
+
+脚本会自动装好系统依赖、Swift 6.3 与 xtool AppImage，并打印后续三件必须手动做的事
+（下载 Xcode.xip → `xtool setup` 登录 → `usbipd` 连接设备）。
+
+### 手动收尾
+
+```bash
+xtool setup            # 登录 Apple ID + 指定 Xcode.xip 路径，生成 darwin SDK
+swift sdk list         # 应显示 darwin
+
+# Windows 端（管理员 PowerShell）
+winget install usbipd
+usbipd list
+usbipd bind   --busid <BUSID>
+usbipd attach --wsl --busid <BUSID>
+
+# WSL 端
+ideviceinfo            # 能输出设备信息即连接成功
+xtool dev              # 构建 → 注册设备 → 生成证书/描述文件 → 签名 → 安装
+```
+
+首次部署时手机上要点「信任」并输入锁屏密码，还需在 设置 → 隐私与安全性 中开启**开发者模式**；
+若报错，按提示处理后再执行一次 `xtool dev`。
+
+### 已知限制
+
+- 不支持 Asset Catalog（`.xcassets`）与 Storyboard —— 本项目图形全部程序化绘制，不受影响；
+- 不支持 SwiftData 的 `@Model` 等 Apple 私有宏；
+- 只能做**开发签名部署**，不能上传 App Store（上架仍需 Xcode 或付费账号的正式流程）；
+- iOS 17+ 上的 LLDB 调试受限，需借助 pymobiledevice3 等外部工具；
+- xtool 依赖提取 Xcode 工具链，注意其与 Apple 开发者协议（ADPLA）的合规边界，自用评估风险。
+
+### 不想装 WSL 的替代方案
+
+直接拿 CI 产出的 `CatMerge-unsigned-IPA`（Actions 下载），在 Windows 上用
+**AltStore / SideStore / iMazing** 之类的工具配合免费 Apple ID 做个人签名安装（7 天有效期）。
+这条路不需要 WSL、也不需要 Xcode.xip。
