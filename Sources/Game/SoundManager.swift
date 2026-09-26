@@ -160,7 +160,9 @@ private enum WAVBuilder {
 
 private extension Data {
     mutating func appendLE<T: FixedWidthInteger>(_ value: T) {
-        withUnsafeBytes(of: value.littleEndian) { buffer in
+        // 必须显式写 Swift.：Data 自身也有 withUnsafeBytes 实例方法，
+        // 不加限定会被解析成实例方法而编译报错。
+        Swift.withUnsafeBytes(of: value.littleEndian) { buffer in
             append(contentsOf: buffer)
         }
     }

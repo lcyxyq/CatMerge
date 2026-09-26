@@ -32,8 +32,8 @@ struct GameView: View {
             ScoreboardView()
         }
         .onAppear(perform: applySettings)
-        .onChange(of: soundEnabled) { _ in applySettings() }
-        .onChange(of: hapticsEnabled) { _ in applySettings() }
+        .onChange(of: soundEnabled) { _, _ in applySettings() }
+        .onChange(of: hapticsEnabled) { _, _ in applySettings() }
     }
 
     // MARK: - 顶部信息栏
