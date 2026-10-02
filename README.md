@@ -76,6 +76,7 @@ ScoreStore（UserDefaults 本地存档）
 ```
 CatMerge/
 ├── README.md
+├── COMPLIANCE.md                  中国大陆合规：国务院令第810号 + 备案 / 版号清单
 ├── project.yml                    xcodegen 工程描述（CI 用它生成 .xcodeproj）
 ├── Info.plist                     App 配置（已在根，无需 Xcode 模板）
 ├── .github/workflows/
@@ -165,6 +166,8 @@ CatMerge/
 - [ ] 截图：6.9" / 6.5" 竖屏各一组，覆盖浅色与深色
 - [ ] 描述中明确：**完全离线、无广告、无内购、无账号**
 - [ ] App 内"关于"页：注明玩法参考来源与许可证（Apache-2.0 / Unlicense）
+- [ ] **国务院令第810号**：App Store Connect → 商务 → 协议 → 合规 → 810 号令，补全身份与税务信息（个人填身份证 / 公司填 DUNS + 统一社会信用代码）
+- [ ] 中国大陆上架另需**工信部 App 备案**与**游戏版号（ISBN）**，App 内须可查备案信息 —— 详见 [COMPLIANCE.md](COMPLIANCE.md)
 - [ ] 无网络请求 → 无需提供账号删除功能；无需隐私政策之外的合规项（仍建议准备一份简短隐私政策链接）
 
 ---

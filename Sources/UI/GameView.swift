@@ -8,6 +8,7 @@ struct GameView: View {
     @AppStorage("catmerge.haptics") private var hapticsEnabled = true
 
     @State private var showScoreboard = false
+    @State private var showAbout = false
     @State private var isResultCardDismissed = false
     @ScaledMetric(relativeTo: .body) private var spacing: CGFloat = 12
     @Environment(\.colorScheme) private var colorScheme
@@ -30,6 +31,9 @@ struct GameView: View {
         }
         .sheet(isPresented: $showScoreboard) {
             ScoreboardView()
+        }
+        .sheet(isPresented: $showAbout) {
+            AboutView()
         }
         .onAppear(perform: applySettings)
         .onChange(of: soundEnabled) { _, _ in applySettings() }
@@ -118,11 +122,24 @@ struct GameView: View {
     }
 
     private var footer: some View {
-        Text("拖动瞄准 · 松手放下 · 两只相同的猫会合成更大的猫")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
-            .multilineTextAlignment(.center)
-            .frame(maxWidth: .infinity)
+        VStack(spacing: 4) {
+            Text("拖动瞄准 · 松手放下 · 两只相同的猫会合成更大的猫")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity)
+
+            Button {
+                showAbout = true
+            } label: {
+                Text("关于与合规信息")
+                    .font(.footnote)
+                    .frame(minWidth: 44, minHeight: 44)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("关于与合规信息")
+            .accessibilityHint("查看版本号、备案信息与开源许可")
+        }
     }
 
     // MARK: - 结算卡片
